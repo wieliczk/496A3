@@ -7,6 +7,7 @@ import numpy as np
 from pattern import pat3set
 import sys
 import random
+import gtp_connection
 
 class GoBoardUtil(object):
     
@@ -89,7 +90,79 @@ class GoBoardUtil(object):
                 if not second_filter:
                     good_moves.append(m)
         return good_moves
-        
+
+    # @staticmethod
+    # def rule_one_test(board, filtered_moves):
+    #     color = board.current_player
+    #     if color == 1:
+    #         op_color = 2
+    #     else:
+    #         op_color = 1
+    #     all_neigh = [] 
+    #     checked = []
+    #     to_check = []
+    #     to_check.append(board.last_move)
+    #     while len(to_check) > 0:
+    #         n_list = board._neighbors(board.board[to_check[0]])
+    #         checked.append(to_check[0])
+    #         for n in n_list:
+    #             all_neigh.append(n)
+    #             if board.board[n] == 0:
+    #                 print("Empty")
+    #             if board.board[n] == 3:
+    #                 continue
+    #             if board.board[n] == op_color:
+    #                 continue
+    #             if board.board[n] == color:
+    #                 print("Here")
+    #                 if n not in checked:
+    #                     to_check.append(n)
+    #         to_check.pop(0)
+    #     print(all_neigh)
+    #     return []
+
+
+
+    @staticmethod
+    def find_neighbours(board, move, neigh_list, prev_points):
+        """
+        Finds all the neighbours and stores them into a list
+        """
+        nbr = board._neighbors(move)
+        prev_points.append(move)
+        op_color = board.board[move] # Gets correct color
+        if op_color == BLACK:
+            color = WHITE
+        else:
+            color = BLACK
+        for n in nbr:
+            neigh_list.append(n)
+            if board.board[n] == op_color:
+                if n not in prev_points:
+                    GoBoardUtil.find_neighbours(board, n, neigh_list, prev_points)
+
+    @staticmethod
+    def gather_libs(board, a_list):
+        """
+        Finds the number of liberties for a group of stones
+        Returns, the ammount of liberties as well as each liberty point
+        """
+        libs = 0
+        moves = []
+        for n in a_list:
+            if board.board[n] == 0:
+                libs += 1
+                moves.append(n)
+        return libs, moves
+
+    @staticmethod
+    def convert_point_to_move(move):
+        cords = GoBoardUtil.point_to_coord(move)
+        cord = GoBoardUtil.format_point(cords)
+        return cord
+
+
+
     @staticmethod
     def generate_all_policy_moves(board,pattern,check_selfatari):
         """
@@ -97,14 +170,27 @@ class GoBoardUtil(object):
             Use in UI only. For playing, use generate_move_with_filter
             which is more efficient
         """
-        # BW Code
-        test = GoBoardUtil.new_filters_for_moves(board)
+        """
+            # BW Code
+            This portion of code is for the capture move
+        """
+        try:
+            n_list = []
+            checked_points = []
+            testing = GoBoardUtil.new_filters_for_moves(board)
+            last_played = board.last_move
+            GoBoardUtil.find_neighbours(board, last_played, n_list, checked_points)
+            libs, capture_point = GoBoardUtil.gather_libs(board, n_list)
+            if libs == 1:
+                if capture_point[0] in testing:
+                    return capture_point, "AtariCapture"
+        except:
+            do_nothing = 1
+
         # Test is now filtered set of moves 
         # Should now check if can capture last move 
         # If not check for defense 
         # If neither move on to pattern moves 
-        if len(test) > 0:
-            return test, "Test"
 
         pattern_moves = GoBoardUtil.generate_pattern_moves(board)
         pattern_moves = GoBoardUtil.filter_moves(board, pattern_moves, check_selfatari)
@@ -215,7 +301,7 @@ class GoBoardUtil(object):
     @staticmethod
     def blocks_max_liberty(board, point, color, limit):
         assert board.board[point] == EMPTY
-        max_lib = -1 # will return this value if this point is a new block
+        max_lib = -1 # will return this value if this point is a bwnew block
         neighbors = board._neighbors(point)
         for n in neighbors:
             if board.board[n] == color:

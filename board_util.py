@@ -178,41 +178,6 @@ class GoBoardUtil(object):
                     moves.append(point)
         return moves
 
-    # @staticmethod
-    # def sort_stones_for_defense(board, stone, checked):
-    #     # Look at each stone (Point)
-    #     clr = board.current_player
-    #     # Make sure the stone hasn't been looked at 
-    #     if stone not in checked:
-    #         # Add stone into checked list
-    #         checked.append(n)
-    #         # Get Stones neighbours
-    #         nbr = board._neighbors(n)
-    #         # Check for other like stones
-    #         for n in nbr: 
-    #             if board.board[n] == clr:
-    #                 GoBoardUtil.sort_stones_for_defense(board, n, checked)
-
-    # @staticmethod
-    # def d_find_neighbours(board, move, neigh_list, prev_points):
-    #     """
-    #     Finds all the neighbours and stores them into a list
-    #     """
-    #     nbr = board._neighbors(move)
-    #     prev_points.append(move)
-    #     op_color = board.board[move] # Gets correct color
-    #     if op_color == BLACK:
-    #         color = WHITE
-    #     else:
-    #         color = BLACK
-    #     for n in nbr:
-    #         neigh_list.append(n)
-    #         if board.board[n] == op_color:
-    #             if n not in prev_points:
-    #                 GoBoardUtil.find_neighbours(board, n, neigh_list, prev_points)
-
-
-
     @staticmethod
     def generate_all_policy_moves(board,pattern,check_selfatari):
         """
@@ -229,7 +194,6 @@ class GoBoardUtil(object):
         try:
             n_list = []
             checked_points = []
-            #testing = GoBoardUtil.new_filters_for_moves(board)
             last_played = board.last_move
             GoBoardUtil.find_neighbours(board, last_played, n_list, checked_points)
             libs, capture_point = GoBoardUtil.gather_libs(board, n_list)
@@ -251,11 +215,7 @@ class GoBoardUtil(object):
                 op_color = BLACK
             else:
                 op_color = WHITE
-            # Neighbors of last played move
             GoBoardUtil.find_neighbours(board, d_last_played, d_list, d_checked, 2)
-
-            #print(d_list)
-
             """
                 op_moves = all the neighbours of the opponents moves
                 our_moves = all of our moves (stones) affected by op_moves
@@ -282,8 +242,6 @@ class GoBoardUtil(object):
                             defend_moves.append(defend_point[0])
 
             # Capture_defend is a set of neighbours to our stone set that only have a single liberty 
-            #print(capture_defend)
-
             opp_stone_sets = []
             for a_list in capture_defend:
                 a_checked_list = []
@@ -299,51 +257,14 @@ class GoBoardUtil(object):
                     defend_moves.append(s_points[0])
         except:
             do_nothing = 1
-            
-
-        #         opp_stones = []
-        #         GoBoardUtil.find_neighbours(board, a_nbr, opp_stones, a_checked_list, 2)
-        #         print(opp_stones)
-
-        # List of all opponent stones
-        # for x in d_list:
-        #     print(x)
-        #     d_libs = 0
-        #     c_libs, d_point = GoBoardUtil.gather_libs(board, x)
-        #     if c_libs == 1:
-        #         new_check = d_point[0]
-        #         nbr = board._neighbors(new_check)
-        #         n_libs, new_p = GoBoardUtil.gather_libs(board, nbr)
-        #         if n_libs > 1:
-        #             defend_moves.append(d_point[0])
         if len(defend_moves) > 0:
             return defend_moves, "AtariDefense"
-
-
-
-
-
-        #current_p_stones = GoBoardUtil.all_points_for_defense(board)
-        # d_libs, d_cap_point = GoBoardUtil.gather_libs(board, d_list)
-        # print(d_libs)
-        # if d_libs == 1:
-        #     return capture_point, "AHHH"
-        #GoBoardUtil.sort_stones_for_defense(board,)
         """
             TODO:
             Find neighbours of each stone in current_p_sonts
             If a group of stones make sure to connect them 
             Show all defenses 
         """
-        
-
-
-        # Test is now filtered set of moves 
-        # Should now check if can capture last move 
-        # If not check for defense 
-        # If neither move on to pattern moves 
-
-
         pattern_moves = GoBoardUtil.generate_pattern_moves(board)
         pattern_moves = GoBoardUtil.filter_moves(board, pattern_moves, check_selfatari)
         if len(pattern_moves) > 0:

@@ -146,6 +146,7 @@ class GoBoardUtil(object):
                     if n not in prev_points and n not in neigh_list:
                         GoBoardUtil.find_neighbours(board, n, neigh_list, prev_points, c_d)
 
+
     @staticmethod
     def gather_libs(board, a_list):
         """
@@ -177,20 +178,20 @@ class GoBoardUtil(object):
                     moves.append(point)
         return moves
 
-    @staticmethod
-    def sort_stones_for_defense(board, stone, checked):
-        # Look at each stone (Point)
-        clr = board.current_player
-        # Make sure the stone hasn't been looked at 
-        if stone not in checked:
-            # Add stone into checked list
-            checked.append(n)
-            # Get Stones neighbours
-            nbr = board._neighbors(n)
-            # Check for other like stones
-            for n in nbr: 
-                if board.board[n] == clr:
-                    GoBoardUtil.sort_stones_for_defense(board, n, checked)
+    # @staticmethod
+    # def sort_stones_for_defense(board, stone, checked):
+    #     # Look at each stone (Point)
+    #     clr = board.current_player
+    #     # Make sure the stone hasn't been looked at 
+    #     if stone not in checked:
+    #         # Add stone into checked list
+    #         checked.append(n)
+    #         # Get Stones neighbours
+    #         nbr = board._neighbors(n)
+    #         # Check for other like stones
+    #         for n in nbr: 
+    #             if board.board[n] == clr:
+    #                 GoBoardUtil.sort_stones_for_defense(board, n, checked)
 
     # @staticmethod
     # def d_find_neighbours(board, move, neigh_list, prev_points):
@@ -223,10 +224,12 @@ class GoBoardUtil(object):
             # BW Code
             This portion of code is for the capture move
         """
+
+        testing = GoBoardUtil.new_filters_for_moves(board)
         try:
             n_list = []
             checked_points = []
-            testing = GoBoardUtil.new_filters_for_moves(board)
+            #testing = GoBoardUtil.new_filters_for_moves(board)
             last_played = board.last_move
             GoBoardUtil.find_neighbours(board, last_played, n_list, checked_points)
             libs, capture_point = GoBoardUtil.gather_libs(board, n_list)
@@ -237,27 +240,71 @@ class GoBoardUtil(object):
             do_nothing = 1
 
 
-        # Gets all stones of player on board
-        defend_moves = []
-        d_checked = []
-        d_list = []
-        d_last_played = board.last_move
-        color = board.current_player
-        # Neighbors of last played move
-        GoBoardUtil.find_neighbours(board, d_last_played, d_list, d_checked, 2)
+        try:
+            # Gets all stones of player on board
+            defend_moves = []
+            d_checked = []
+            d_list = []
+            d_last_played = board.last_move
+            color = board.current_player
+            if color == WHITE:
+                op_color = BLACK
+            else:
+                op_color = WHITE
+            # Neighbors of last played move
+            GoBoardUtil.find_neighbours(board, d_last_played, d_list, d_checked, 2)
 
-        #print(d_list)
-        our_moves_checked = []
-        for op_moves in d_list:
-            our_moves = []
-            if board.board[op_moves] == color:
-                GoBoardUtil.find_neighbours(board, op_moves, our_moves, our_moves_checked)
-                libs, defend_point = GoBoardUtil.gather_libs(board, our_moves)
-                if libs == 1:
-                    nbr = board._neighbors(defend_point[0])
-                    n_libs, useless = GoBoardUtil.gather_libs(board, nbr)
-                    if n_libs > 1:
-                        defend_moves.append(defend_point[0])
+            #print(d_list)
+
+            """
+                op_moves = all the neighbours of the opponents moves
+                our_moves = all of our moves (stones) affected by op_moves
+                if an board.board[op_moves] 
+                    a neighbour of an opponent move is our color we find the neighbours of that stone which are our color
+                we then find the liberties of this new list of our_moves
+                if our_moves only has 1 liberty
+            """
+            capture_defend = []
+            our_moves_checked = []
+            for op_moves in d_list:
+                our_moves = []
+                if board.board[op_moves] == color:
+                    GoBoardUtil.find_neighbours(board, op_moves, our_moves, our_moves_checked)
+                    libs, defend_point = GoBoardUtil.gather_libs(board, our_moves)
+                    if libs == 1:
+                        capture_defend.append(our_moves)
+                        extra_check = []
+                        extra_list = []
+                        checking = defend_point[0]
+                        GoBoardUtil.find_neighbours(board, checking, extra_list, extra_check)
+                        n_libs, useless = GoBoardUtil.gather_libs(board, extra_list)
+                        if n_libs > 1 and defend_point[0] in testing and defend_point[0] not in defend_moves: 
+                            defend_moves.append(defend_point[0])
+
+            # Capture_defend is a set of neighbours to our stone set that only have a single liberty 
+            #print(capture_defend)
+
+            opp_stone_sets = []
+            for a_list in capture_defend:
+                a_checked_list = []
+                for a_nbr in a_list:
+                    opp_stones = []
+                    if board.board[a_nbr] == op_color:
+                        GoBoardUtil.find_neighbours(board, a_nbr, opp_stones, a_checked_list, 2)
+                        opp_stone_sets.append(opp_stones)
+            # Take sets of stones around atari and see if any can be captured
+            for set_stones in opp_stone_sets:
+                s_libs, s_points = GoBoardUtil.gather_libs(board, set_stones)
+                if s_libs == 1 and s_points[0] in testing and s_points[0] not in defend_moves:
+                    defend_moves.append(s_points[0])
+        except:
+            do_nothing = 1
+            
+
+        #         opp_stones = []
+        #         GoBoardUtil.find_neighbours(board, a_nbr, opp_stones, a_checked_list, 2)
+        #         print(opp_stones)
+
         # List of all opponent stones
         # for x in d_list:
         #     print(x)
@@ -270,7 +317,7 @@ class GoBoardUtil(object):
         #         if n_libs > 1:
         #             defend_moves.append(d_point[0])
         if len(defend_moves) > 0:
-            return defend_moves, "AHHHHHHHHHHH"
+            return defend_moves, "AtariDefense"
 
 
 

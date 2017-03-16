@@ -496,7 +496,7 @@ class GoBoardUtil(object):
         """convert character representing player color to the appropriate number"""
         color_to_int = {"b": BLACK , "w": WHITE, "e":EMPTY, "BORDER":BORDER, "FLOODFILL":FLOODFILL}
         try:
-           return color_to_int[c] 
+            return color_to_int[c] 
         except:
             raise ValueError("wrong color")
     
@@ -505,7 +505,7 @@ class GoBoardUtil(object):
         """convert number representing player color to the appropriate character """
         int_to_color = {BLACK:"b", WHITE:"w", EMPTY:"e", BORDER:"BORDER", FLOODFILL:"FLOODFILL"}
         try:
-           return int_to_color[i] 
+            return int_to_color[i] 
         except:
             raise ValueError("Provided integer value for color is invalid")
          

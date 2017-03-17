@@ -5,6 +5,7 @@ from board_util import GoBoardUtil
 import argparse
 import sys
 from pattern import pat3set
+from random import randint
 
 parser = argparse.ArgumentParser(description='Process Arguments for number of simulation')
 parser.add_argument('-s','--sim',type=int, nargs='?', default=10, help='define number of simulations for each legal move, #playout --> sim*num_of_legal_moves')
@@ -47,6 +48,8 @@ class Go4Player(object):
         """
         self.num_simulation = num_simulation
         self.limit = limit
+        self.ataricapture = True
+        self.ataridefense = True
     
     def simulate(self, board, cboard, move, toplay):
         GoBoardUtil.copyb2b(board,cboard)
@@ -69,6 +72,8 @@ class Go4Player(object):
         return wins
         
     def get_move(self, board, toplay):
+        f_capture = 0
+        f_defend = 0
         cboard = board.copy()
         emptyPoints = board.get_empty_points()
         moves = []
@@ -80,10 +85,32 @@ class Go4Player(object):
         moves.append(None) # None for Pass
         moveWins = []
         for move in moves:
+            if self.ataricapture == True:
+                cap = GoBoardUtil.generate_capture_move(board)
+                if cap != None:
+                    if len(cap) > 0:
+                        cappin_move = GoBoardUtil.sorted_point_string(cap, board.NS)
+                        f_capture = 1 
+                        break
+
+            if self.ataridefense == True:
+                defense = GoBoardUtil.generate_defend_moves(board)
+                if defense != None:
+                    if len(defense) > 0:
+                        randy = randint(0, len(defense)-1)
+                        d_picked = defense[randy]
+                        f_defend = 1
+                        break
             wins = self.simulateMove(board, cboard, move, toplay)
             moveWins.append(wins)
-        writeMoves(board, moves, moveWins, self.num_simulation)
-        return select_best_move(board, moves, moveWins)
+        if f_capture == 1:
+            return cap[0]
+        if f_defend == 1:
+            return d_picked
+        if f_capture == 0 and f_defend == 0:
+            writeMoves(board, moves, moveWins, self.num_simulation)
+            return select_best_move(board, moves, moveWins)
+
 
     def get_properties(self):
         return dict(

@@ -60,6 +60,7 @@ class GoBoardUtil(object):
         for point in points:
             x, y = GoBoardUtil.point_to_coord(point, ns)
             result.append(GoBoardUtil.format_point((x, y)))
+
         return ' '.join(sorted(result))
 
     @staticmethod
@@ -90,36 +91,6 @@ class GoBoardUtil(object):
                 if not second_filter:
                     good_moves.append(m)
         return good_moves
-
-    # @staticmethod
-    # def rule_one_test(board, filtered_moves):
-    #     color = board.current_player
-    #     if color == 1:
-    #         op_color = 2
-    #     else:
-    #         op_color = 1
-    #     all_neigh = [] 
-    #     checked = []
-    #     to_check = []
-    #     to_check.append(board.last_move)
-    #     while len(to_check) > 0:
-    #         n_list = board._neighbors(board.board[to_check[0]])
-    #         checked.append(to_check[0])
-    #         for n in n_list:
-    #             all_neigh.append(n)
-    #             if board.board[n] == 0:
-    #                 print("Empty")
-    #             if board.board[n] == 3:
-    #                 continue
-    #             if board.board[n] == op_color:
-    #                 continue
-    #             if board.board[n] == color:
-    #                 print("Here")
-    #                 if n not in checked:
-    #                     to_check.append(n)
-    #         to_check.pop(0)
-    #     print(all_neigh)
-    #     return []
 
 
 
@@ -179,17 +150,12 @@ class GoBoardUtil(object):
         return moves
 
     @staticmethod
-    def generate_all_policy_moves(board,pattern,check_selfatari):
-        """
-            generate a list of policy moves on board for board.current_player.
-            Use in UI only. For playing, use generate_move_with_filter
-            which is more efficient
-        """
+    def generate_capture_move(board):
         """
             # BW Code
             This portion of code is for the capture move
         """
-
+        empty_return = []
         testing = GoBoardUtil.new_filters_for_moves(board)
         try:
             n_list = []
@@ -199,11 +165,15 @@ class GoBoardUtil(object):
             libs, capture_point = GoBoardUtil.gather_libs(board, n_list)
             if libs == 1:
                 if capture_point[0] in testing:
-                    return capture_point, "AtariCapture"
+                    return capture_point              
         except:
             do_nothing = 1
+            return empty_return
 
-
+    @staticmethod
+    def generate_defend_moves(board):
+        empty_return = []
+        testing = GoBoardUtil.new_filters_for_moves(board)
         try:
             # Gets all stones of player on board
             defend_moves = []
@@ -215,7 +185,8 @@ class GoBoardUtil(object):
                 op_color = BLACK
             else:
                 op_color = WHITE
-            GoBoardUtil.find_neighbours(board, d_last_played, d_list, d_checked, 2)
+            #GoBoardUtil.find_neighbours(board, d_last_played, d_list, d_checked, 2)
+            d_list = board._neighbors(d_last_played)
             """
                 op_moves = all the neighbours of the opponents moves
                 our_moves = all of our moves (stones) affected by op_moves
@@ -257,14 +228,92 @@ class GoBoardUtil(object):
                     defend_moves.append(s_points[0])
         except:
             do_nothing = 1
+            return empty_return
         if len(defend_moves) > 0:
-            return defend_moves, "AtariDefense"
+            return defend_moves
+        else:
+            return empty_return
+
+    @staticmethod
+    def generate_all_policy_moves(board,pattern,check_selfatari):
+        """
+            generate a list of policy moves on board for board.current_player.
+            Use in UI only. For playing, use generate_move_with_filter
+            which is more efficient
+        """
+
+
+
+        # try:
+        #     # Gets all stones of player on board
+        #     defend_moves = []
+        #     d_checked = []
+        #     d_list = []
+        #     d_last_played = board.last_move
+        #     color = board.current_player
+        #     if color == WHITE:
+        #         op_color = BLACK
+        #     else:
+        #         op_color = WHITE
+        #     GoBoardUtil.find_neighbours(board, d_last_played, d_list, d_checked, 2)
+        #     """
+        #         op_moves = all the neighbours of the opponents moves
+        #         our_moves = all of our moves (stones) affected by op_moves
+        #         if an board.board[op_moves] 
+        #             a neighbour of an opponent move is our color we find the neighbours of that stone which are our color
+        #         we then find the liberties of this new list of our_moves
+        #         if our_moves only has 1 liberty
+        #     """
+        # #     capture_defend = []
+        # #     our_moves_checked = []
+        # #     for op_moves in d_list:
+        # #         our_moves = []
+        # #         if board.board[op_moves] == color:
+        # #             GoBoardUtil.find_neighbours(board, op_moves, our_moves, our_moves_checked)
+        # #             libs, defend_point = GoBoardUtil.gather_libs(board, our_moves)
+        # #             if libs == 1:
+        # #                 capture_defend.append(our_moves)
+        # #                 extra_check = []
+        # #                 extra_list = []
+        # #                 checking = defend_point[0]
+        # #                 GoBoardUtil.find_neighbours(board, checking, extra_list, extra_check)
+        # #                 n_libs, useless = GoBoardUtil.gather_libs(board, extra_list)
+        # #                 if n_libs > 1 and defend_point[0] in testing and defend_point[0] not in defend_moves: 
+        # #                     defend_moves.append(defend_point[0])
+
+        # #     # Capture_defend is a set of neighbours to our stone set that only have a single liberty 
+        # #     opp_stone_sets = []
+        # #     for a_list in capture_defend:
+        # #         a_checked_list = []
+        # #         for a_nbr in a_list:
+        # #             opp_stones = []
+        # #             if board.board[a_nbr] == op_color:
+        # #                 GoBoardUtil.find_neighbours(board, a_nbr, opp_stones, a_checked_list, 2)
+        # #                 opp_stone_sets.append(opp_stones)
+        # #     # Take sets of stones around atari and see if any can be captured
+        # #     for set_stones in opp_stone_sets:
+        # #         s_libs, s_points = GoBoardUtil.gather_libs(board, set_stones)
+        # #         if s_libs == 1 and s_points[0] in testing and s_points[0] not in defend_moves:
+        # #             defend_moves.append(s_points[0])
+        # # except:
+        # #     do_nothing = 1
+        # # if len(defend_moves) > 0:
+        # #     return defend_moves, "AtariDefense"
         """
             TODO:
             Find neighbours of each stone in current_p_sonts
             If a group of stones make sure to connect them 
             Show all defenses 
         """
+        capture_move = GoBoardUtil.generate_capture_move(board)
+        if capture_move != None:
+            if len(capture_move) > 0:
+                return capture_move, "AtariCapture"
+
+        defend_moves = GoBoardUtil.generate_defend_moves(board)
+        if len(defend_moves) > 0:
+            return defend_moves, "AtariDefense"
+
         pattern_moves = GoBoardUtil.generate_pattern_moves(board)
         pattern_moves = GoBoardUtil.filter_moves(board, pattern_moves, check_selfatari)
         if len(pattern_moves) > 0:

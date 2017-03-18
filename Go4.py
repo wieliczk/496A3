@@ -39,8 +39,8 @@ class Go4Player(object):
     Flat Monte Carlo implementation that uses simulation for finding the best child of a given node
     """
 
-    version = 0.3
-    name = "Go4"
+    version = 0.32
+    name = "Go4ACAD"
     def __init__(self,num_simulation=10,size=7,limit=100):
         """
         self.selfatari & self.pattern gets created in the gtp_connection, 
@@ -104,8 +104,10 @@ class Go4Player(object):
             wins = self.simulateMove(board, cboard, move, toplay)
             moveWins.append(wins)
         if f_capture == 1:
+            print("Capture")
             return cap[0]
         if f_defend == 1:
+            print("Defense")
             return d_picked
         if f_capture == 0 and f_defend == 0:
             writeMoves(board, moves, moveWins, self.num_simulation)

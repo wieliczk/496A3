@@ -1,0 +1,20 @@
+Script started on Sat 18 Mar 2017 03:41:39 PM DST
+]0;wieliczk@DESKTOP-IB893MA: ~/CMPUT496/496A3wieliczk@DESKTOP-IB893MA:~/CMPUT496/496A3$ gogio-re[K[K[K[K[Kui=[K-regress -long "python3"[K Go4.py" a3-sample.gtp 
+10 passed
+20 passed
+30 passed
+40 passed
+50 passed
+60 passed
+70 passed
+80 passed
+90 passed
+100 passed
+110 passed
+120 passed
+130 passed
+Summary: 13/13 passes. 0 unexpected passes, 0 unexpected failures
+]0;wieliczk@DESKTOP-IB893MA: ~/CMPUT496/496A3wieliczk@DESKTOP-IB893MA:~/CMPUT496/496A3$ exit
+exit
+
+Script done on Sat 18 Mar 2017 03:42:30 PM DST

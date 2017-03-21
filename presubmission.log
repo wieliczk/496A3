@@ -1,5 +1,6 @@
-Script started on Sat 18 Mar 2017 03:41:39 PM DST
-]0;wieliczk@DESKTOP-IB893MA: ~/CMPUT496/496A3wieliczk@DESKTOP-IB893MA:~/CMPUT496/496A3$ gogio-re[K[K[K[K[Kui=[K-regress -long "python3"[K Go4.py" a3-sample.gtp 
+Script started on Tue 21 Mar 2017 09:52:18 AM MDT
+wieliczk@ug17:/cshome/c496/usr/local/bin>./gogui-regress -long -output [K ~/C496/ G o4.[K[K[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[K ~ /cd[K[KC496/A[K496A3/Go4.py ~/cd[K[KC496/a3-sample.gtp 
 10 passed
 20 passed
 30 passed
@@ -14,7 +15,7 @@ Script started on Sat 18 Mar 2017 03:41:39 PM DST
 120 passed
 130 passed
 Summary: 13/13 passes. 0 unexpected passes, 0 unexpected failures
-]0;wieliczk@DESKTOP-IB893MA: ~/CMPUT496/496A3wieliczk@DESKTOP-IB893MA:~/CMPUT496/496A3$ exit
+wieliczk@ug17:/cshome/c496/usr/local/bin>exit
 exit
 
-Script done on Sat 18 Mar 2017 03:42:30 PM DST
+Script done on Tue 21 Mar 2017 09:53:53 AM MDT
